@@ -1,0 +1,28 @@
+{
+    "transactions": [
+        {
+            "id": 1775198270978,
+            "title": "Month of March",
+            "amount": "50000",
+            "category": "Salary",
+            "type": "income",
+            "date": "2026-04-03 12:07:50"
+        },
+        {
+            "id": 1775198302245,
+            "title": "House Rent",
+            "amount": "10000",
+            "category": "Rent",
+            "type": "expense",
+            "date": "2026-04-03 12:08:22"
+        },
+        {
+            "id": 1775198557119,
+            "title": "Education ",
+            "amount": "7500",
+            "category": "Entertainment",
+            "type": "expense",
+            "date": "2026-04-03 12:12:37"
+        }
+    ]
+}
