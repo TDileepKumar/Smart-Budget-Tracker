@@ -5,16 +5,42 @@ body {
     padding: 0;
 }
 
+.navbar {
+    background-color: #2d89ef;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+}
+
+.nav-brand {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: bold;
+}
+
+.nav-links a:hover {
+    text-decoration: underline;
+}
+
 .container {
     width: 85%;
     margin: 30px auto;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4 {
     text-align: center;
 }
 
-.summary-grid {
+.summary-grid,
+.monthly-summary-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
@@ -24,7 +50,10 @@ h1, h2, h3 {
 .summary-card,
 .form-box,
 .transactions-box,
-.chart-box {
+.chart-box,
+.monthly-summary-box,
+.monthly-card,
+.assistant-box {
     background: white;
     padding: 20px;
     margin-bottom: 20px;
@@ -32,7 +61,8 @@ h1, h2, h3 {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.summary-card p {
+.summary-card p,
+.monthly-card p {
     font-size: 24px;
     font-weight: bold;
     text-align: center;
@@ -48,6 +78,18 @@ h1, h2, h3 {
 
 .balance-card {
     border-left: 6px solid #2d89ef;
+}
+
+.monthly-income {
+    border-left: 6px solid #20c997;
+}
+
+.monthly-expense {
+    border-left: 6px solid #fd7e14;
+}
+
+.monthly-balance {
+    border-left: 6px solid #6f42c1;
 }
 
 form {
@@ -119,4 +161,19 @@ th {
 
 #expenseChart {
     max-height: 400px;
+}
+
+.assistant-box {
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.assistant-list {
+    list-style-position: inside;
+    padding-left: 0;
+    text-align: left;
+    max-width: 300px;
+    margin: 20px auto 0;
 }

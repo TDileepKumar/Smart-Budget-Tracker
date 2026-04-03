@@ -28,6 +28,26 @@
             </div>
         </div>
 
+        <div class="monthly-summary-box">
+            <h3>This Month Summary</h3>
+            <div class="monthly-summary-grid">
+                <div class="monthly-card monthly-income">
+                    <h4>Monthly Income</h4>
+                    <p>₹{{ monthly_income }}</p>
+                </div>
+
+                <div class="monthly-card monthly-expense">
+                    <h4>Monthly Expense</h4>
+                    <p>₹{{ monthly_expense }}</p>
+                </div>
+
+                <div class="monthly-card monthly-balance">
+                    <h4>Monthly Balance</h4>
+                    <p>₹{{ monthly_balance }}</p>
+                </div>
+            </div>
+        </div>
+
         <div class="form-box">
             <h3>Add Transaction</h3>
             <form method="POST">

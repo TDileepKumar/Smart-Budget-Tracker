@@ -37,6 +37,28 @@ def calculate_summary(transactions):
     return total_income, total_expense, balance
 
 
+def calculate_monthly_summary(transactions):
+    current_month = datetime.now().month
+    current_year = datetime.now().year
+
+    monthly_income = 0
+    monthly_expense = 0
+
+    for transaction in transactions:
+        transaction_date = datetime.strptime(transaction["date"], "%Y-%m-%d %H:%M:%S")
+
+        if transaction_date.month == current_month and transaction_date.year == current_year:
+            amount = float(transaction["amount"])
+
+            if transaction["type"] == "income":
+                monthly_income += amount
+            else:
+                monthly_expense += amount
+
+    monthly_balance = monthly_income - monthly_expense
+    return monthly_income, monthly_expense, monthly_balance
+
+
 def get_expense_chart_data(transactions):
     category_totals = {}
 
@@ -57,7 +79,7 @@ def get_expense_chart_data(transactions):
 
 
 @app.route("/", methods=["GET", "POST"])
-def index():
+def dashboard():
     data = load_data()
 
     if request.method == "POST":
@@ -78,21 +100,38 @@ def index():
         data["transactions"].append(new_transaction)
         save_data(data)
 
-        return redirect(url_for("index"))
+        return redirect(url_for("dashboard"))
 
     transactions = data["transactions"]
+
     total_income, total_expense, balance = calculate_summary(transactions)
+    monthly_income, monthly_expense, monthly_balance = calculate_monthly_summary(transactions)
     chart_labels, chart_values = get_expense_chart_data(transactions)
 
     return render_template(
-        "index.html",
-        transactions=transactions,
+        "dashboard.html",
         total_income=total_income,
         total_expense=total_expense,
         balance=balance,
+        monthly_income=monthly_income,
+        monthly_expense=monthly_expense,
+        monthly_balance=monthly_balance,
         chart_labels=chart_labels,
         chart_values=chart_values
     )
+
+
+@app.route("/history")
+def history():
+    data = load_data()
+    transactions = data["transactions"]
+
+    return render_template("history.html", transactions=transactions)
+
+
+@app.route("/assistant")
+def assistant():
+    return render_template("assistant.html")
 
 
 @app.route("/delete/<int:transaction_id>", methods=["POST"])
@@ -105,7 +144,7 @@ def delete_transaction(transaction_id):
     ]
 
     save_data(data)
-    return redirect(url_for("index"))
+    return redirect(url_for("history"))
 
 
 if __name__ == "__main__":
