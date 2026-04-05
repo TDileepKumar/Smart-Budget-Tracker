@@ -14,7 +14,7 @@
                 <th>Category</th>
                 <th>Amount</th>
                 <th>Date</th>
-                <th>Action</th>
+                <th></th>
             </tr>
 
             {% for transaction in transactions %}
@@ -26,7 +26,7 @@
                 <td>{{ transaction.date }}</td>
                 <td>
                     <form action="{{ url_for('delete_transaction', transaction_id=transaction.id) }}" method="POST" class="delete-form">
-                        <button type="submit" class="delete-btn">Delete</button>
+                        <button type="submit" class="icon-delete-btn" title="Delete Transaction">🗑️</button>
                     </form>
                 </td>
             </tr>

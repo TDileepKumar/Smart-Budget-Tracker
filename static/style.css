@@ -98,26 +98,27 @@ form {
 }
 
 input,
-select,
+select {
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
 button {
+    border: none;
+    cursor: pointer;
+}
+
+form button:not(.icon-delete-btn) {
+    background-color: #2d89ef;
+    color: white;
     padding: 12px;
     font-size: 16px;
     border-radius: 6px;
 }
 
-input,
-select {
-    border: 1px solid #ccc;
-}
-
-button {
-    background-color: #2d89ef;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-button:hover {
+form button:not(.icon-delete-btn):hover {
     background-color: #1b5fa7;
 }
 
@@ -127,11 +128,14 @@ table {
     margin-top: 10px;
 }
 
-table, th, td {
+table,
+th,
+td {
     border: 1px solid #ddd;
 }
 
-th, td {
+th,
+td {
     padding: 12px;
     text-align: center;
 }
@@ -144,13 +148,18 @@ th {
     display: inline;
 }
 
-.delete-btn {
-    background-color: #dc3545;
-    padding: 8px 12px;
+.icon-delete-btn {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #dc3545;
+    padding: 4px 8px;
 }
 
-.delete-btn:hover {
-    background-color: #b02a37;
+.icon-delete-btn:hover {
+    color: #b02a37;
+    transform: scale(1.1);
 }
 
 .chart-box {
@@ -176,4 +185,25 @@ th {
     text-align: left;
     max-width: 300px;
     margin: 20px auto 0;
+}
+
+.chat-box {
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: #f9f9f9;
+}
+
+.user-message {
+    text-align: right;
+    margin: 5px 0;
+    color: #2d89ef;
+}
+
+.bot-message {
+    text-align: left;
+    margin: 5px 0;
+    color: #333;
 }
