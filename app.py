@@ -1,17 +1,18 @@
-from flask import Flask
-from routes.main_routes import main
-from database import init_db
 from dotenv import load_dotenv
 import os
-os.environ["OPENAI_API_KEY"] = "your_api_key_here"
 
 load_dotenv()
 
+from flask import Flask
+from routes.main_routes import main
+from database import init_db
+
 app = Flask(__name__)
-app.secret_key = "super_secret_key"
+app.secret_key = os.getenv("SECRET_KEY", "change-this-secret-key")
 
 init_db()
 app.register_blueprint(main)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)

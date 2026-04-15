@@ -1,9 +1,13 @@
 import os
 from openai import OpenAI
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+api_key = os.getenv("OPENAI_API_KEY")
 
-print("API KEY:", os.getenv("OPENAI_API_KEY"))
+if not api_key:
+    raise ValueError("❌ OPENAI_API_KEY not found. Check your .env file.")
+
+client = OpenAI(api_key=api_key)
+
 
 def get_ai_response(question, summary_text):
     try:
@@ -12,7 +16,7 @@ def get_ai_response(question, summary_text):
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a smart financial assistant. Give clear, short, practical advice."
+                    "content": "You are a smart financial assistant. Give short, practical advice."
                 },
                 {
                     "role": "user",
@@ -22,15 +26,13 @@ User question:
 
 Financial summary:
 {summary_text}
-
-Give a helpful answer based on this data.
 """
                 }
             ],
             temperature=0.5,
         )
 
-        return response.choices[0].message.content
+        return response.choices[0].message.content.strip()
 
     except Exception as e:
         return f"AI error: {str(e)}"

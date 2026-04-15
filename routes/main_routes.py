@@ -3,6 +3,7 @@ from datetime import datetime
 import csv
 import io
 
+from services.budget_service import set_budget, get_budgets
 from services.auth_service import create_user, login_user
 from services.analytics_service import (
     calculate_summary,
@@ -19,7 +20,6 @@ from services.db_service import (
     update_transaction_db,
     delete_transaction_db,
 )
-from services.budget_service import set_budget, get_budgets
 
 main = Blueprint("main", __name__)
 
@@ -113,7 +113,6 @@ def dashboard():
                     return redirect(url_for("main.dashboard"))
             except ValueError:
                 error_message = "Invalid budget amount."
-
         else:
             title = request.form.get("title", "").strip()
             amount_raw = request.form.get("amount", "").strip()
@@ -376,22 +375,28 @@ def ask():
         return "Please login first."
 
     user_id = session["user_id"]
-
-    # ✅ THIS LINE WAS MISSING
     question = request.form.get("question", "").strip().lower()
 
     if not question:
         return "Please ask a valid question."
 
     transactions = get_all_transactions_db(user_id)
-
-    from services.budget_service import get_budgets
-    from datetime import datetime
-
     budgets = get_budgets(
         user_id,
         datetime.now().month,
         datetime.now().year
     )
 
-    return build_assistant_response(question, transactions, budgets)
+    response = build_assistant_response(question, transactions, budgets)
+
+    if response == "AI_FALLBACK":
+        return (
+            "I can help with:\n"
+            "- Income and expense tracking\n"
+            "- Balance and savings\n"
+            "- Monthly analysis\n"
+            "- Budget usage and overspending\n"
+            "- Spending insights"
+        )
+
+    return response
