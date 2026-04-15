@@ -11,9 +11,11 @@
     <nav class="navbar">
         <div class="nav-brand">Smart Budget Tracker</div>
         <div class="nav-links">
-            <a href="{{ url_for('dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('history') }}">History</a>
-            <a href="{{ url_for('assistant') }}">AI Assistant</a>
+            <a href="{{ url_for('main.home') }}">Home</a>
+            <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('main.history') }}">History</a>
+            <a href="{{ url_for('main.analytics') }}">Analytics</a>
+            <a href="{{ url_for('main.assistant') }}">Smart Assistant</a>
         </div>
     </nav>
 

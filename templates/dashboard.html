@@ -8,17 +8,17 @@
 <div class="summary-grid">
     <div class="summary-card income-card">
         <h3>Total Income</h3>
-        <p>₹{{ total_income }}</p>
+        <p>₹{{ "%.2f"|format(total_income) }}</p>
     </div>
 
     <div class="summary-card expense-card">
         <h3>Total Expense</h3>
-        <p>₹{{ total_expense }}</p>
+        <p>₹{{ "%.2f"|format(total_expense) }}</p>
     </div>
 
     <div class="summary-card balance-card">
         <h3>Current Balance</h3>
-        <p>₹{{ balance }}</p>
+        <p>₹{{ "%.2f"|format(balance) }}</p>
     </div>
 </div>
 
@@ -26,113 +26,181 @@
     <h3>This Month Summary</h3>
     <div class="monthly-summary-grid">
         <div class="monthly-card monthly-income">
-            <h4>Monthly Income</h4>
-            <p>₹{{ monthly_income }}</p>
+            <h4>Income</h4>
+            <p>₹{{ "%.2f"|format(monthly_income) }}</p>
         </div>
 
         <div class="monthly-card monthly-expense">
-            <h4>Monthly Expense</h4>
-            <p>₹{{ monthly_expense }}</p>
+            <h4>Expense</h4>
+            <p>₹{{ "%.2f"|format(monthly_expense) }}</p>
         </div>
 
         <div class="monthly-card monthly-balance">
-            <h4>Monthly Balance</h4>
-            <p>₹{{ monthly_balance }}</p>
+            <h4>Balance</h4>
+            <p>₹{{ "%.2f"|format(monthly_balance) }}</p>
         </div>
     </div>
 </div>
 
-<div class="form-box">
-    <h3>Add Transaction</h3>
-    <form method="POST">
-        <input type="text" name="title" placeholder="Enter description" required>
+<div class="dashboard-flex">
+    <div class="form-box">
+        <h3>Add Transaction</h3>
 
-        <select name="type" id="type" required onchange="updateCategories()">
-            <option value="">Select Type</option>
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
-        </select>
+        {% if error_message %}
+            <p class="error-message">{{ error_message }}</p>
+        {% endif %}
 
-        <select name="category" id="category" required>
-            <option value="">Select Category</option>
-        </select>
+        <form method="POST">
+            <input type="text" name="title" placeholder="Enter description" required>
 
-        <input type="number" step="0.01" name="amount" placeholder="Enter amount" required>
+            <select name="type" id="type" required onchange="updateCategories()">
+                <option value="">Select Type</option>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
 
-        <button type="submit">Add Transaction</button>
-    </form>
+            <select name="category" id="category" required>
+                <option value="">Select Category</option>
+            </select>
+
+            <input type="number" step="1" min="1" name="amount" placeholder="Enter amount" required>
+
+            <button type="submit">Add Transaction</button>
+        </form>
+    </div>
+
+    <div class="chart-box">
+        <h3>Expense Breakdown</h3>
+
+        {% if chart_labels %}
+            <canvas id="expenseChart"></canvas>
+        {% else %}
+            <p class="empty-message">No data to display</p>
+        {% endif %}
+    </div>
 </div>
 
-<div class="chart-box">
-    <h3>Expense Breakdown by Category</h3>
-    <canvas id="expenseChart"></canvas>
+<div class="dashboard-flex">
+    <div class="form-box">
+        <h3>Set Budget</h3>
+
+        <form method="POST">
+            <select name="budget_category" required>
+                <option value="">Select Category</option>
+                {% for c in expense_categories %}
+                    <option value="{{ c }}">{{ c }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="number" step="1" min="1" name="budget_amount" placeholder="Enter budget amount" required>
+
+            <button type="submit">Set Budget</button>
+        </form>
+    </div>
+
+    <div class="transactions-box">
+        <h3>Budget Status</h3>
+
+        {% if budget_status %}
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Budget</th>
+                    <th>Spent</th>
+                    <th>Remaining</th>
+                </tr>
+
+                {% for b in budget_status %}
+                <tr>
+                    <td>{{ b.category }}</td>
+                    <td>₹{{ "%.2f"|format(b.budget) }}</td>
+                    <td>₹{{ "%.2f"|format(b.spent) }}</td>
+                    <td style="color: {{ 'red' if b.remaining < 0 else 'green' }}">
+                        ₹{{ "%.2f"|format(b.remaining) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p class="empty-message">No budgets set yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="transactions-box">
+    <h3>Recent Transactions</h3>
+
+    {% if recent_transactions %}
+        <table>
+            <tr>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Date</th>
+            </tr>
+
+            {% for t in recent_transactions %}
+            <tr>
+                <td>{{ t.title }}</td>
+                <td class="{{ 'type-income' if t.type == 'income' else 'type-expense' }}">
+                    {{ t.type|title }}
+                </td>
+                <td>{{ t.category }}</td>
+                <td>₹{{ "%.2f"|format(t.amount) }}</td>
+                <td>{{ t.date }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div class="dashboard-link-row">
+            <a href="{{ url_for('main.history') }}" class="action-link secondary-link">View Full History</a>
+        </div>
+    {% else %}
+        <p class="empty-message">No transactions added yet.</p>
+    {% endif %}
 </div>
 
 <script>
+    const incomeCategories = {{ income_categories | tojson }};
+    const expenseCategories = {{ expense_categories | tojson }};
+
     function updateCategories() {
-        const typeSelect = document.getElementById("type");
-        const categorySelect = document.getElementById("category");
+        const type = document.getElementById("type").value;
+        const category = document.getElementById("category");
 
-        const incomeCategories = [
-            "Salary",
-            "Freelance",
-            "Business",
-            "Bonus",
-            "Investment",
-            "Other Income"
-        ];
+        category.innerHTML = '<option value="">Select Category</option>';
 
-        const expenseCategories = [
-            "Food",
-            "Travel",
-            "Bills",
-            "Shopping",
-            "Rent",
-            "Entertainment",
-            "Health",
-            "Other Expense"
-        ];
+        let list = type === "income" ? incomeCategories : expenseCategories;
 
-        categorySelect.innerHTML = '<option value="">Select Category</option>';
-
-        let selectedCategories = [];
-
-        if (typeSelect.value === "income") {
-            selectedCategories = incomeCategories;
-        } else if (typeSelect.value === "expense") {
-            selectedCategories = expenseCategories;
-        }
-
-        selectedCategories.forEach(function(category) {
-            const option = document.createElement("option");
-            option.value = category;
-            option.textContent = category;
-            categorySelect.appendChild(option);
+        list.forEach(c => {
+            let opt = document.createElement("option");
+            opt.value = c;
+            opt.textContent = c;
+            category.appendChild(opt);
         });
     }
 
-    const chartLabels = {{ chart_labels | tojson }};
-    const chartValues = {{ chart_values | tojson }};
+    const labels = {{ chart_labels | tojson }};
+    const values = {{ chart_values | tojson }};
 
-    const ctx = document.getElementById("expenseChart").getContext("2d");
-
-    new Chart(ctx, {
-        type: "pie",
-        data: {
-            labels: chartLabels,
-            datasets: [{
-                label: "Expenses by Category",
-                data: chartValues
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: "bottom"
+    if (labels.length > 0) {
+        new Chart(document.getElementById("expenseChart"), {
+            type: "pie",
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: "bottom" }
                 }
             }
-        }
-    });
+        });
+    }
 </script>
+
 {% endblock %}

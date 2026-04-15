@@ -1,151 +1,17 @@
-from flask import Flask, render_template, request, redirect, url_for
-import json
+from flask import Flask
+from routes.main_routes import main
+from database import init_db
+from dotenv import load_dotenv
 import os
-from datetime import datetime
+os.environ["OPENAI_API_KEY"] = "your_api_key_here"
+
+load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = "super_secret_key"
 
-DATA_FILE = "data.json"
-
-
-def load_data():
-    if not os.path.exists(DATA_FILE):
-        return {"transactions": []}
-
-    with open(DATA_FILE, "r") as file:
-        return json.load(file)
-
-
-def save_data(data):
-    with open(DATA_FILE, "w") as file:
-        json.dump(data, file, indent=4)
-
-
-def calculate_summary(transactions):
-    total_income = 0
-    total_expense = 0
-
-    for transaction in transactions:
-        amount = float(transaction["amount"])
-
-        if transaction["type"] == "income":
-            total_income += amount
-        else:
-            total_expense += amount
-
-    balance = total_income - total_expense
-    return total_income, total_expense, balance
-
-
-def calculate_monthly_summary(transactions):
-    current_month = datetime.now().month
-    current_year = datetime.now().year
-
-    monthly_income = 0
-    monthly_expense = 0
-
-    for transaction in transactions:
-        transaction_date = datetime.strptime(transaction["date"], "%Y-%m-%d %H:%M:%S")
-
-        if transaction_date.month == current_month and transaction_date.year == current_year:
-            amount = float(transaction["amount"])
-
-            if transaction["type"] == "income":
-                monthly_income += amount
-            else:
-                monthly_expense += amount
-
-    monthly_balance = monthly_income - monthly_expense
-    return monthly_income, monthly_expense, monthly_balance
-
-
-def get_expense_chart_data(transactions):
-    category_totals = {}
-
-    for transaction in transactions:
-        if transaction["type"] == "expense":
-            category = transaction["category"]
-            amount = float(transaction["amount"])
-
-            if category in category_totals:
-                category_totals[category] += amount
-            else:
-                category_totals[category] = amount
-
-    labels = list(category_totals.keys())
-    values = list(category_totals.values())
-
-    return labels, values
-
-
-@app.route("/", methods=["GET", "POST"])
-def dashboard():
-    data = load_data()
-
-    if request.method == "POST":
-        title = request.form["title"]
-        amount = request.form["amount"]
-        category = request.form["category"]
-        transaction_type = request.form["type"]
-
-        new_transaction = {
-            "id": int(datetime.now().timestamp() * 1000),
-            "title": title,
-            "amount": amount,
-            "category": category,
-            "type": transaction_type,
-            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-
-        data["transactions"].append(new_transaction)
-        save_data(data)
-
-        return redirect(url_for("dashboard"))
-
-    transactions = data["transactions"]
-
-    total_income, total_expense, balance = calculate_summary(transactions)
-    monthly_income, monthly_expense, monthly_balance = calculate_monthly_summary(transactions)
-    chart_labels, chart_values = get_expense_chart_data(transactions)
-
-    return render_template(
-        "dashboard.html",
-        total_income=total_income,
-        total_expense=total_expense,
-        balance=balance,
-        monthly_income=monthly_income,
-        monthly_expense=monthly_expense,
-        monthly_balance=monthly_balance,
-        chart_labels=chart_labels,
-        chart_values=chart_values
-    )
-
-
-@app.route("/history")
-def history():
-    data = load_data()
-    transactions = data["transactions"]
-
-    return render_template("history.html", transactions=transactions)
-
-
-@app.route("/assistant")
-def assistant():
-    return render_template("assistant.html")
-
-
-@app.route("/delete/<int:transaction_id>", methods=["POST"])
-def delete_transaction(transaction_id):
-    data = load_data()
-
-    data["transactions"] = [
-        transaction for transaction in data["transactions"]
-        if transaction["id"] != transaction_id
-    ]
-
-    save_data(data)
-    return redirect(url_for("history"))
-
+init_db()
+app.register_blueprint(main)
 
 if __name__ == "__main__":
     app.run(debug=True)

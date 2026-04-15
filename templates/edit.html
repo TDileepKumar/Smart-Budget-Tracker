@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Transaction{% endblock %}
+
+{% block content %}
+<h1>Edit Transaction</h1>
+
+<div class="form-box">
+    {% if error_message %}
+        <p class="error-message">{{ error_message }}</p>
+    {% endif %}
+
+    <form method="POST">
+        <input type="text" name="title" value="{{ transaction.title }}" required>
+
+        <select name="type">
+            <option value="income" {{ 'selected' if transaction.type == 'income' else '' }}>Income</option>
+            <option value="expense" {{ 'selected' if transaction.type == 'expense' else '' }}>Expense</option>
+        </select>
+
+        <select name="category">
+            {% for c in income_categories + expense_categories %}
+            <option value="{{ c }}" {{ 'selected' if transaction.category == c else '' }}>{{ c }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="number" step="1" name="amount" value="{{ transaction.amount }}" required>
+
+        <button type="submit">Update</button>
+    </form>
+</div>
+{% endblock %}

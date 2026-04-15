@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Smart Budget Tracker{% endblock %}
+
+{% block content %}
+<h1>Analytics Dashboard</h1>
+
+<div class="summary-grid">
+    <div class="summary-card income-card">
+        <h3>Total Income</h3>
+        <p>₹{{ "%.2f"|format(total_income) }}</p>
+    </div>
+
+    <div class="summary-card expense-card">
+        <h3>Total Expense</h3>
+        <p>₹{{ "%.2f"|format(total_expense) }}</p>
+    </div>
+
+    <div class="summary-card balance-card">
+        <h3>Balance</h3>
+        <p>₹{{ "%.2f"|format(balance) }}</p>
+    </div>
+</div>
+
+<div class="analytics-grid">
+    <div class="analytics-card">
+        <h3>This Month</h3>
+        <p><strong>Income:</strong> ₹{{ "%.2f"|format(monthly_income) }}</p>
+        <p><strong>Expense:</strong> ₹{{ "%.2f"|format(monthly_expense) }}</p>
+        <p><strong>Balance:</strong> ₹{{ "%.2f"|format(monthly_balance) }}</p>
+    </div>
+
+    <div class="analytics-card">
+        <h3>Quick Stats</h3>
+        <p><strong>Total Transactions:</strong> {{ transaction_count }}</p>
+        <p><strong>Top Category:</strong>
+            {% if top_category %}
+                {{ top_category }} (₹{{ "%.2f"|format(top_amount) }})
+            {% else %}
+                No data
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+<div class="analytics-charts">
+
+    <div class="chart-box">
+        <h3>Monthly Trend</h3>
+        {% if trend_labels %}
+            <canvas id="trendChart"></canvas>
+        {% else %}
+            <p class="empty-message">No data</p>
+        {% endif %}
+    </div>
+
+    <div class="chart-box">
+        <h3>Expense Breakdown</h3>
+        {% if expense_labels %}
+            <canvas id="expenseChart"></canvas>
+        {% else %}
+            <p class="empty-message">No data</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+    const trendLabels = {{ trend_labels | tojson }};
+    const incomeValues = {{ income_values | tojson }};
+    const expenseValuesTrend = {{ expense_trend_values | tojson }};
+
+    if (trendLabels.length > 0) {
+        new Chart(document.getElementById("trendChart"), {
+            type: "bar",
+            data: {
+                labels: trendLabels,
+                datasets: [
+                    { label: "Income", data: incomeValues },
+                    { label: "Expense", data: expenseValuesTrend }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: "bottom" } }
+            }
+        });
+    }
+
+    const expenseLabels = {{ expense_labels | tojson }};
+    const expenseValues = {{ expense_values | tojson }};
+
+    if (expenseLabels.length > 0) {
+        new Chart(document.getElementById("expenseChart"), {
+            type: "doughnut",
+            data: {
+                labels: expenseLabels,
+                datasets: [{ data: expenseValues }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: "bottom" } }
+            }
+        });
+    }
+</script>
+
+{% endblock %}
