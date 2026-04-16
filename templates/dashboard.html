@@ -170,7 +170,6 @@ th {
 
     <h1>Dashboard</h1>
 
-    <!-- Summary -->
     <div class="summary-grid">
         <div class="card">
             <h3>Total Income</h3>
@@ -188,7 +187,6 @@ th {
         </div>
     </div>
 
-    <!-- Monthly Summary -->
     <div class="card">
         <h3>This Month Summary</h3>
 
@@ -210,9 +208,7 @@ th {
         </div>
     </div>
 
-    <!-- Add Transaction + Chart -->
     <div class="flex">
-
         <div class="card form-box">
             <h3>Add Transaction</h3>
 
@@ -233,7 +229,7 @@ th {
                     <option value="">Select Category</option>
                 </select>
 
-                <input type="number" name="amount" placeholder="Amount" required>
+                <input type="number" step="0.01" min="0.01" name="amount" placeholder="Amount" required>
 
                 <button type="submit">Add Transaction</button>
             </form>
@@ -249,10 +245,8 @@ th {
                 <p class="empty-message">No data</p>
             {% endif %}
         </div>
-
     </div>
 
-    <!-- Budget -->
     <div class="card">
         <h3>Budget</h3>
 
@@ -264,7 +258,7 @@ th {
                 {% endfor %}
             </select>
 
-            <input type="number" name="budget_amount" placeholder="Budget Amount" required>
+            <input type="number" step="0.01" min="0.01" name="budget_amount" placeholder="Budget Amount" required>
 
             <button type="submit">Set Budget</button>
         </form>
@@ -296,7 +290,6 @@ th {
         {% endif %}
     </div>
 
-    <!-- Recent Transactions -->
     <div class="card">
         <h3>Recent Transactions</h3>
 
