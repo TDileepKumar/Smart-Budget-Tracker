@@ -80,6 +80,8 @@ def logout():
 
 @main.route("/")
 def home():
+    if "user_id" in session:
+        return redirect(url_for("main.dashboard"))
     if "user_id" not in session:
         return redirect(url_for("main.login"))
     return render_template("index.html")

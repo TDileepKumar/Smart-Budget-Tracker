@@ -1,90 +1,262 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Smart Budget Tracker{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<h1>Dashboard</h1>
 
-<div class="summary-grid">
-    <div class="summary-card income-card">
-        <h3>Total Income</h3>
-        <p>₹{{ "%.2f"|format(total_income) }}</p>
-    </div>
+<style>
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
 
-    <div class="summary-card expense-card">
-        <h3>Total Expense</h3>
-        <p>₹{{ "%.2f"|format(total_expense) }}</p>
-    </div>
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
 
-    <div class="summary-card balance-card">
-        <h3>Current Balance</h3>
-        <p>₹{{ "%.2f"|format(balance) }}</p>
-    </div>
-</div>
+.card {
+    padding: 20px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
 
-<div class="monthly-summary-box">
-    <h3>This Month Summary</h3>
-    <div class="monthly-summary-grid">
-        <div class="monthly-card monthly-income">
-            <h4>Income</h4>
-            <p>₹{{ "%.2f"|format(monthly_income) }}</p>
+.card h3 {
+    margin-bottom: 10px;
+    color: #cbd5e1;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.card p {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.income { color: #14b8a6; }
+.expense { color: #ef4444; }
+.balance { color: #ff7f6a; }
+
+.month-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.month-box {
+    padding: 16px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+}
+
+.month-box h4 {
+    margin-bottom: 8px;
+    color: #cbd5e1;
+    font-size: 15px;
+}
+
+.month-box p {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.flex {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-box input,
+.form-box select {
+    margin-bottom: 12px;
+}
+
+.form-box button {
+    width: 100%;
+}
+
+.error-message {
+    color: #ff7f6a;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.chart-wrap {
+    height: 320px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+}
+
+td, th {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    color: #e2e8f0;
+}
+
+th {
+    color: #cbd5e1;
+    font-weight: 600;
+}
+
+.type-income {
+    color: #14b8a6;
+    font-weight: 700;
+}
+
+.type-expense {
+    color: #ef4444;
+    font-weight: 700;
+}
+
+.empty-message {
+    color: #cbd5e1;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.dashboard-link-row {
+    margin-top: 16px;
+    text-align: right;
+}
+
+.dashboard-link-row a {
+    display: inline-block;
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.dashboard-link-row a:hover {
+    background: rgba(255,255,255,0.14);
+}
+
+@media (max-width: 900px) {
+    .summary-grid,
+    .month-grid,
+    .flex {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="dashboard">
+
+    <h1>Dashboard</h1>
+
+    <!-- Summary -->
+    <div class="summary-grid">
+        <div class="card">
+            <h3>Total Income</h3>
+            <p class="income">₹{{ "%.2f"|format(total_income) }}</p>
         </div>
 
-        <div class="monthly-card monthly-expense">
-            <h4>Expense</h4>
-            <p>₹{{ "%.2f"|format(monthly_expense) }}</p>
+        <div class="card">
+            <h3>Total Expense</h3>
+            <p class="expense">₹{{ "%.2f"|format(total_expense) }}</p>
         </div>
 
-        <div class="monthly-card monthly-balance">
-            <h4>Balance</h4>
-            <p>₹{{ "%.2f"|format(monthly_balance) }}</p>
+        <div class="card">
+            <h3>Balance</h3>
+            <p class="balance">₹{{ "%.2f"|format(balance) }}</p>
         </div>
     </div>
-</div>
 
-<div class="dashboard-flex">
-    <div class="form-box">
-        <h3>Add Transaction</h3>
+    <!-- Monthly Summary -->
+    <div class="card">
+        <h3>This Month Summary</h3>
 
-        {% if error_message %}
-            <p class="error-message">{{ error_message }}</p>
-        {% endif %}
+        <div class="month-grid">
+            <div class="month-box">
+                <h4>Income</h4>
+                <p class="income">₹{{ "%.2f"|format(monthly_income) }}</p>
+            </div>
 
-        <form method="POST">
-            <input type="text" name="title" placeholder="Enter description" required>
+            <div class="month-box">
+                <h4>Expense</h4>
+                <p class="expense">₹{{ "%.2f"|format(monthly_expense) }}</p>
+            </div>
 
-            <select name="type" id="type" required onchange="updateCategories()">
-                <option value="">Select Type</option>
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-            </select>
-
-            <select name="category" id="category" required>
-                <option value="">Select Category</option>
-            </select>
-
-            <input type="number" step="1" min="1" name="amount" placeholder="Enter amount" required>
-
-            <button type="submit">Add Transaction</button>
-        </form>
+            <div class="month-box">
+                <h4>Balance</h4>
+                <p class="balance">₹{{ "%.2f"|format(monthly_balance) }}</p>
+            </div>
+        </div>
     </div>
 
-    <div class="chart-box">
-        <h3>Expense Breakdown</h3>
+    <!-- Add Transaction + Chart -->
+    <div class="flex">
 
-        {% if chart_labels %}
-            <canvas id="expenseChart"></canvas>
-        {% else %}
-            <p class="empty-message">No data to display</p>
-        {% endif %}
+        <div class="card form-box">
+            <h3>Add Transaction</h3>
+
+            {% if error_message %}
+                <p class="error-message">{{ error_message }}</p>
+            {% endif %}
+
+            <form method="POST">
+                <input type="text" name="title" placeholder="Description" required>
+
+                <select name="type" id="type" onchange="updateCategories()" required>
+                    <option value="">Select Type</option>
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                </select>
+
+                <select name="category" id="category" required>
+                    <option value="">Select Category</option>
+                </select>
+
+                <input type="number" name="amount" placeholder="Amount" required>
+
+                <button type="submit">Add Transaction</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Expense Breakdown</h3>
+            {% if chart_labels %}
+                <div class="chart-wrap">
+                    <canvas id="chart"></canvas>
+                </div>
+            {% else %}
+                <p class="empty-message">No data</p>
+            {% endif %}
+        </div>
+
     </div>
-</div>
 
-<div class="dashboard-flex">
-    <div class="form-box">
-        <h3>Set Budget</h3>
+    <!-- Budget -->
+    <div class="card">
+        <h3>Budget</h3>
 
-        <form method="POST">
+        <form method="POST" class="form-box">
             <select name="budget_category" required>
                 <option value="">Select Category</option>
                 {% for c in expense_categories %}
@@ -92,16 +264,13 @@
                 {% endfor %}
             </select>
 
-            <input type="number" step="1" min="1" name="budget_amount" placeholder="Enter budget amount" required>
+            <input type="number" name="budget_amount" placeholder="Budget Amount" required>
 
             <button type="submit">Set Budget</button>
         </form>
-    </div>
-
-    <div class="transactions-box">
-        <h3>Budget Status</h3>
 
         {% if budget_status %}
+        <div class="table-wrap">
             <table>
                 <tr>
                     <th>Category</th>
@@ -115,92 +284,99 @@
                     <td>{{ b.category }}</td>
                     <td>₹{{ "%.2f"|format(b.budget) }}</td>
                     <td>₹{{ "%.2f"|format(b.spent) }}</td>
-                    <td style="color: {{ 'red' if b.remaining < 0 else 'green' }}">
+                    <td style="color: {{ 'red' if b.remaining < 0 else '#14b8a6' }}; font-weight:700;">
                         ₹{{ "%.2f"|format(b.remaining) }}
                     </td>
                 </tr>
                 {% endfor %}
             </table>
+        </div>
         {% else %}
             <p class="empty-message">No budgets set yet.</p>
         {% endif %}
     </div>
-</div>
 
-<div class="transactions-box">
-    <h3>Recent Transactions</h3>
+    <!-- Recent Transactions -->
+    <div class="card">
+        <h3>Recent Transactions</h3>
 
-    {% if recent_transactions %}
-        <table>
-            <tr>
-                <th>Description</th>
-                <th>Type</th>
-                <th>Category</th>
-                <th>Amount</th>
-                <th>Date</th>
-            </tr>
+        {% if recent_transactions %}
+        <div class="table-wrap">
+            <table>
+                <tr>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
 
-            {% for t in recent_transactions %}
-            <tr>
-                <td>{{ t.title }}</td>
-                <td class="{{ 'type-income' if t.type == 'income' else 'type-expense' }}">
-                    {{ t.type|title }}
-                </td>
-                <td>{{ t.category }}</td>
-                <td>₹{{ "%.2f"|format(t.amount) }}</td>
-                <td>{{ t.date }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+                {% for t in recent_transactions %}
+                <tr>
+                    <td>{{ t.title }}</td>
+                    <td class="{{ 'type-income' if t.type == 'income' else 'type-expense' }}">
+                        {{ t.type|title }}
+                    </td>
+                    <td>{{ t.category }}</td>
+                    <td>₹{{ "%.2f"|format(t.amount) }}</td>
+                    <td>{{ t.date }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
 
         <div class="dashboard-link-row">
-            <a href="{{ url_for('main.history') }}" class="action-link secondary-link">View Full History</a>
+            <a href="{{ url_for('main.history') }}">View Full History</a>
         </div>
-    {% else %}
-        <p class="empty-message">No transactions added yet.</p>
-    {% endif %}
+        {% else %}
+            <p class="empty-message">No recent transactions.</p>
+        {% endif %}
+    </div>
+
 </div>
 
 <script>
-    const incomeCategories = {{ income_categories | tojson }};
-    const expenseCategories = {{ expense_categories | tojson }};
+const incomeCategories = {{ income_categories | tojson }};
+const expenseCategories = {{ expense_categories | tojson }};
 
-    function updateCategories() {
-        const type = document.getElementById("type").value;
-        const category = document.getElementById("category");
+function updateCategories() {
+    const type = document.getElementById("type").value;
+    const category = document.getElementById("category");
 
-        category.innerHTML = '<option value="">Select Category</option>';
+    category.innerHTML = '<option value="">Select Category</option>';
 
-        let list = type === "income" ? incomeCategories : expenseCategories;
+    let list = type === "income" ? incomeCategories : expenseCategories;
 
-        list.forEach(c => {
-            let opt = document.createElement("option");
-            opt.value = c;
-            opt.textContent = c;
-            category.appendChild(opt);
-        });
-    }
+    list.forEach(c => {
+        let opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        category.appendChild(opt);
+    });
+}
 
-    const labels = {{ chart_labels | tojson }};
-    const values = {{ chart_values | tojson }};
+const labels = {{ chart_labels | tojson }};
+const values = {{ chart_values | tojson }};
 
-    if (labels.length > 0) {
-        new Chart(document.getElementById("expenseChart"), {
-            type: "pie",
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: values
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: "bottom" }
+if (labels.length > 0) {
+    new Chart(document.getElementById("chart"), {
+        type: "pie",
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: "top"
                 }
             }
-        });
-    }
+        }
+    });
+}
 </script>
 
 {% endblock %}

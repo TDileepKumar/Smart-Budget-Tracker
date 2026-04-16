@@ -1,93 +1,294 @@
 {% extends "base.html" %}
 
-{% block title %}History - Smart Budget Tracker{% endblock %}
+{% block title %}History{% endblock %}
 
 {% block content %}
-<h1>Transaction History</h1>
 
-<div class="transactions-box">
+<style>
+.history-page {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
 
-    <div class="filter-box">
-        <form method="GET">
+.filter-card,
+.history-card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(16px);
+    border-radius: 18px;
+    padding: 20px;
+}
 
-            <input type="text" name="search" placeholder="Search..." value="{{ search_query or '' }}">
+.filter-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr auto;
+    gap: 12px;
+    align-items: center;
+}
 
+.filter-form button {
+    width: 100%;
+}
+
+.transaction-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 20px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.transaction-item:hover {
+    transform: translateY(-2px);
+    border-color: rgba(20,184,166,0.35);
+}
+
+.transaction-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.transaction-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.income-icon {
+    background: rgba(20,184,166,0.16);
+    color: #14b8a6;
+}
+
+.expense-icon {
+    background: rgba(239,68,68,0.16);
+    color: #ef4444;
+}
+
+.transaction-info {
+    min-width: 0;
+}
+
+.transaction-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.transaction-meta {
+    font-size: 13px;
+    color: #cbd5e1;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.transaction-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.amount {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.amount.income {
+    color: #14b8a6;
+}
+
+.amount.expense {
+    color: #ff7f6a;
+}
+
+.action-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.icon-btn,
+.delete-btn {
+    border: none;
+    background: rgba(255,255,255,0.08);
+    color: white;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.icon-btn:hover,
+.delete-btn:hover {
+    background: rgba(255,255,255,0.16);
+    transform: translateY(-1px);
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.history-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.secondary-btn {
+    display: inline-block;
+    padding: 11px 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: white;
+    font-weight: 600;
+}
+
+.secondary-btn:hover {
+    background: rgba(255,255,255,0.14);
+}
+
+.empty-message {
+    text-align: center;
+    color: #cbd5e1;
+    padding: 24px 0;
+}
+
+@media (max-width: 900px) {
+    .filter-form {
+        grid-template-columns: 1fr;
+    }
+
+    .transaction-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .transaction-right {
+        align-items: stretch;
+    }
+
+    .action-row {
+        justify-content: flex-end;
+    }
+}
+</style>
+
+<div class="history-page">
+    <h1>Transaction History</h1>
+
+    <div class="filter-card">
+        <div class="history-header">
+            <h3>Filters</h3>
+            <div class="history-actions">
+                <a href="{{ url_for('main.history') }}" class="secondary-btn">Reset</a>
+                <a href="{{ url_for('main.export_history_csv', type=selected_type, category=selected_category, search=search_query) }}" class="secondary-btn">Export CSV</a>
+            </div>
+        </div>
+
+        <form method="GET" class="filter-form" style="margin-top:16px;">
             <select name="type">
-                <option value="">All</option>
+                <option value="">All Types</option>
                 <option value="income" {{ 'selected' if selected_type == 'income' else '' }}>Income</option>
                 <option value="expense" {{ 'selected' if selected_type == 'expense' else '' }}>Expense</option>
             </select>
 
             <select name="category">
-                <option value="">Category</option>
+                <option value="">All Categories</option>
+                <option value="Salary" {{ 'selected' if selected_category == 'Salary' else '' }}>Salary</option>
+                <option value="Freelance" {{ 'selected' if selected_category == 'Freelance' else '' }}>Freelance</option>
+                <option value="Business" {{ 'selected' if selected_category == 'Business' else '' }}>Business</option>
+                <option value="Bonus" {{ 'selected' if selected_category == 'Bonus' else '' }}>Bonus</option>
+                <option value="Investment" {{ 'selected' if selected_category == 'Investment' else '' }}>Investment</option>
+                <option value="Other Income" {{ 'selected' if selected_category == 'Other Income' else '' }}>Other Income</option>
                 <option value="Food" {{ 'selected' if selected_category == 'Food' else '' }}>Food</option>
-                <option value="Rent" {{ 'selected' if selected_category == 'Rent' else '' }}>Rent</option>
-                <option value="Shopping" {{ 'selected' if selected_category == 'Shopping' else '' }}>Shopping</option>
+                <option value="Travel" {{ 'selected' if selected_category == 'Travel' else '' }}>Travel</option>
                 <option value="Bills" {{ 'selected' if selected_category == 'Bills' else '' }}>Bills</option>
+                <option value="Shopping" {{ 'selected' if selected_category == 'Shopping' else '' }}>Shopping</option>
+                <option value="Rent" {{ 'selected' if selected_category == 'Rent' else '' }}>Rent</option>
                 <option value="Entertainment" {{ 'selected' if selected_category == 'Entertainment' else '' }}>Entertainment</option>
                 <option value="Health" {{ 'selected' if selected_category == 'Health' else '' }}>Health</option>
                 <option value="Education" {{ 'selected' if selected_category == 'Education' else '' }}>Education</option>
+                <option value="Other Expense" {{ 'selected' if selected_category == 'Other Expense' else '' }}>Other Expense</option>
             </select>
 
-            <button type="submit">Apply</button>
+            <input type="text" name="search" placeholder="Search by title, category, type, or date" value="{{ search_query or '' }}">
 
-            <a href="{{ url_for('main.history') }}" class="action-link secondary-link">Reset</a>
-
-            <a href="{{ url_for('main.export_history_csv', type=selected_type, category=selected_category, search=search_query) }}" class="action-link export-link">
-                Export
-            </a>
-
+            <button type="submit">Apply Filters</button>
         </form>
     </div>
 
-    {% if transactions %}
+    <div class="history-card">
+        {% if transactions %}
+            <div class="transaction-list">
+                {% for t in transactions %}
+                <div class="transaction-item">
+                    <div class="transaction-left">
+                        <div class="transaction-icon {{ 'income-icon' if t.type == 'income' else 'expense-icon' }}">
+                            {{ '↑' if t.type == 'income' else '↓' }}
+                        </div>
 
-        <div class="history-list">
-
-            {% for t in transactions %}
-            <div class="history-card">
-
-                <div class="history-icon">
-                    {% if t.type == 'income' %}
-                        ↑
-                    {% else %}
-                        ↓
-                    {% endif %}
-                </div>
-
-                <div class="history-content">
-                    <h3>{{ t.title }}</h3>
-                    <p>{{ t.category }} • {{ t.date }}</p>
-                </div>
-
-                <div class="history-actions">
-
-                    <div class="amount {{ 'income-text' if t.type == 'income' else 'expense-text' }}">
-                        {% if t.type == 'income' %}
-                            +₹{{ "%.2f"|format(t.amount) }}
-                        {% else %}
-                            -₹{{ "%.2f"|format(t.amount) }}
-                        {% endif %}
+                        <div class="transaction-info">
+                            <div class="transaction-title">{{ t.title }}</div>
+                            <div class="transaction-meta">
+                                <span>{{ t.category }}</span>
+                                <span>{{ t.date }}</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="action-icons">
-                        <a href="{{ url_for('main.edit_transaction', id=t.id) }}">✏️</a>
+                    <div class="transaction-right">
+                        <div class="amount {{ 'income' if t.type == 'income' else 'expense' }}">
+                            {% if t.type == 'income' %}+{% else %}-{% endif %}₹{{ "%.2f"|format(t.amount) }}
+                        </div>
 
-                        <form action="{{ url_for('main.delete_transaction', id=t.id) }}" method="POST" onsubmit="return confirm('Delete?')">
-                            <button type="submit">🗑️</button>
-                        </form>
+                        <div class="action-row">
+                            <a href="{{ url_for('main.edit_transaction', id=t.id) }}" class="icon-btn" title="Edit">✏️</a>
+
+                            <form action="{{ url_for('main.delete_transaction', id=t.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="delete-btn" title="Delete">🗑️</button>
+                            </form>
+                        </div>
                     </div>
-
                 </div>
-
+                {% endfor %}
             </div>
-            {% endfor %}
-
-        </div>
-
-    {% else %}
-        <p class="empty-message">No transactions found.</p>
-    {% endif %}
-
+        {% else %}
+            <p class="empty-message">No transactions found.</p>
+        {% endif %}
+    </div>
 </div>
+
 {% endblock %}

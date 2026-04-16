@@ -1,64 +1,81 @@
 {% extends "base.html" %}
 
-{% block title %}Home - Smart Budget Tracker{% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="home-hero">
-    <div class="home-hero-text">
-        <h1>Manage Money Without the Mess</h1>
-        <p class="home-description">
-            Smart Budget Tracker helps you record income and expenses, monitor monthly balance,
-            review transaction history, analyze spending patterns, and get quick financial insights
-            from one place.
-        </p>
 
-        <div class="home-actions">
-            <a href="{{ url_for('main.dashboard') }}" class="start-btn">Open Dashboard</a>
-            <a href="{{ url_for('main.history') }}" class="action-link secondary-link">View History</a>
-        </div>
+<style>
+.home-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 75vh;
+}
+
+.home-card {
+    max-width: 720px;
+    width: 100%;
+    padding: 40px;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(18px);
+    text-align: center;
+}
+
+.home-title {
+    font-size: 40px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.home-sub {
+    color: #cbd5e1;
+    margin-bottom: 25px;
+}
+
+.home-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.home-btn {
+    padding: 12px 20px;
+    border-radius: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, #ff7f6a, #ff9a85);
+    color: white;
+}
+
+.secondary-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: white;
+}
+</style>
+
+<div class="home-wrapper">
+
+<div class="home-card">
+
+    <div class="home-title">Smart Budget Tracker</div>
+
+    <div class="home-sub">
+        Track your income, control expenses, and manage budgets with a clean and modern interface.
     </div>
 
-    <div class="home-hero-card">
-        <h3>What You Can Do</h3>
-        <ul class="home-feature-points">
-            <li>Add and manage transactions</li>
-            <li>Track income, expense, and balance</li>
-            <li>Review recent and past history</li>
-            <li>Analyze spending with charts</li>
-            <li>Use Smart Assistant for quick answers</li>
-        </ul>
+    <div class="home-buttons">
+        <a href="{{ url_for('main.login') }}" class="home-btn primary-btn">Get Started</a>
+        <a href="{{ url_for('main.signup') }}" class="home-btn secondary-btn">Create Account</a>
     </div>
+
 </div>
 
-<div class="home-stats-grid">
-    <div class="feature-card">
-        <h3>📊 Dashboard</h3>
-        <p>See totals, monthly summary, expense chart, and your latest transactions in one place.</p>
-    </div>
-
-    <div class="feature-card">
-        <h3>📜 History</h3>
-        <p>Search, filter, edit, delete, and export transactions with a cleaner workflow.</p>
-    </div>
-
-    <div class="feature-card">
-        <h3>📈 Analytics</h3>
-        <p>Understand income trends, expense breakdown, and top spending category with charts.</p>
-    </div>
 </div>
 
-<div class="home-bottom-grid">
-    <div class="feature-card">
-        <h3>🤖 Smart Assistant</h3>
-        <p>Ask quick questions like total income, total expense, balance, monthly summary, and top category.</p>
-    </div>
-
-    <div class="feature-card">
-        <h3>🚀 Why This App</h3>
-        <p>
-            Instead of keeping scattered notes or doing everything manually, this app gives you
-            one organized space to track and understand your finances clearly.
-        </p>
-    </div>
-</div>
 {% endblock %}

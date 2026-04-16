@@ -3,106 +3,281 @@
 {% block title %}Analytics - Smart Budget Tracker{% endblock %}
 
 {% block content %}
-<h1>Analytics Dashboard</h1>
+<style>
+.analytics-page {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+}
 
-<div class="summary-grid">
-    <div class="summary-card income-card">
-        <h3>Total Income</h3>
-        <p>₹{{ "%.2f"|format(total_income) }}</p>
+.analytics-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.analytics-summary-card {
+    padding: 24px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: var(--shadow-lg);
+    transition: transform var(--transition), border-color var(--transition);
+}
+
+.analytics-summary-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(20, 184, 166, 0.35);
+}
+
+.analytics-summary-card h3 {
+    font-size: 17px;
+    margin-bottom: 14px;
+    color: var(--text-soft);
+    font-weight: 600;
+}
+
+.analytics-summary-card p {
+    font-size: 30px;
+    font-weight: 800;
+    margin: 0;
+    color: #ffffff;
+}
+
+.income-glow {
+    box-shadow: 0 18px 36px rgba(20, 184, 166, 0.18);
+}
+
+.expense-glow {
+    box-shadow: 0 18px 36px rgba(239, 68, 68, 0.16);
+}
+
+.balance-glow {
+    box-shadow: 0 18px 36px rgba(255, 127, 106, 0.18);
+}
+
+.analytics-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+.analytics-info-card,
+.analytics-chart-card {
+    padding: 24px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: var(--shadow-lg);
+}
+
+.analytics-info-card h3,
+.analytics-chart-card h3 {
+    margin-bottom: 18px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.analytics-info-card p {
+    color: var(--text-soft);
+    font-size: 16px;
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.analytics-info-card strong {
+    color: #ffffff;
+}
+
+.analytics-chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+.chart-shell {
+    height: 360px;
+    position: relative;
+}
+
+.empty-message {
+    color: var(--text-soft);
+    text-align: center;
+    margin-top: 30px;
+}
+
+@media (max-width: 980px) {
+    .analytics-summary-grid,
+    .analytics-info-grid,
+    .analytics-chart-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-shell {
+        height: 300px;
+    }
+}
+</style>
+
+<div class="analytics-page">
+    <h1>Analytics</h1>
+
+    <div class="analytics-summary-grid">
+        <div class="analytics-summary-card income-glow">
+            <h3>Total Income</h3>
+            <p>₹{{ "%.2f"|format(total_income) }}</p>
+        </div>
+
+        <div class="analytics-summary-card expense-glow">
+            <h3>Total Expense</h3>
+            <p>₹{{ "%.2f"|format(total_expense) }}</p>
+        </div>
+
+        <div class="analytics-summary-card balance-glow">
+            <h3>Balance</h3>
+            <p>₹{{ "%.2f"|format(balance) }}</p>
+        </div>
     </div>
 
-    <div class="summary-card expense-card">
-        <h3>Total Expense</h3>
-        <p>₹{{ "%.2f"|format(total_expense) }}</p>
+    <div class="analytics-info-grid">
+        <div class="analytics-info-card">
+            <h3>This Month</h3>
+            <p><strong>Income:</strong> ₹{{ "%.2f"|format(monthly_income) }}</p>
+            <p><strong>Expense:</strong> ₹{{ "%.2f"|format(monthly_expense) }}</p>
+            <p><strong>Balance:</strong> ₹{{ "%.2f"|format(monthly_balance) }}</p>
+        </div>
+
+        <div class="analytics-info-card">
+            <h3>Quick Stats</h3>
+            <p><strong>Total Transactions:</strong> {{ transaction_count }}</p>
+            <p>
+                <strong>Top Category:</strong>
+                {% if top_category %}
+                    {{ top_category }} (₹{{ "%.2f"|format(top_amount) }})
+                {% else %}
+                    No data
+                {% endif %}
+            </p>
+        </div>
     </div>
 
-    <div class="summary-card balance-card">
-        <h3>Balance</h3>
-        <p>₹{{ "%.2f"|format(balance) }}</p>
-    </div>
-</div>
-
-<div class="analytics-grid">
-    <div class="analytics-card">
-        <h3>This Month</h3>
-        <p><strong>Income:</strong> ₹{{ "%.2f"|format(monthly_income) }}</p>
-        <p><strong>Expense:</strong> ₹{{ "%.2f"|format(monthly_expense) }}</p>
-        <p><strong>Balance:</strong> ₹{{ "%.2f"|format(monthly_balance) }}</p>
-    </div>
-
-    <div class="analytics-card">
-        <h3>Quick Stats</h3>
-        <p><strong>Total Transactions:</strong> {{ transaction_count }}</p>
-        <p><strong>Top Category:</strong>
-            {% if top_category %}
-                {{ top_category }} (₹{{ "%.2f"|format(top_amount) }})
+    <div class="analytics-chart-grid">
+        <div class="analytics-chart-card">
+            <h3>Monthly Trend</h3>
+            {% if trend_labels %}
+                <div class="chart-shell">
+                    <canvas id="trendChart"></canvas>
+                </div>
             {% else %}
-                No data
+                <p class="empty-message">No data available.</p>
             {% endif %}
-        </p>
+        </div>
+
+        <div class="analytics-chart-card">
+            <h3>Expense Breakdown</h3>
+            {% if expense_labels %}
+                <div class="chart-shell">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+            {% else %}
+                <p class="empty-message">No data available.</p>
+            {% endif %}
+        </div>
     </div>
-</div>
-
-<div class="analytics-charts">
-
-    <div class="chart-box">
-        <h3>Monthly Trend</h3>
-        {% if trend_labels %}
-            <canvas id="trendChart"></canvas>
-        {% else %}
-            <p class="empty-message">No data</p>
-        {% endif %}
-    </div>
-
-    <div class="chart-box">
-        <h3>Expense Breakdown</h3>
-        {% if expense_labels %}
-            <canvas id="expenseChart"></canvas>
-        {% else %}
-            <p class="empty-message">No data</p>
-        {% endif %}
-    </div>
-
 </div>
 
 <script>
-    const trendLabels = {{ trend_labels | tojson }};
-    const incomeValues = {{ income_values | tojson }};
-    const expenseValuesTrend = {{ expense_trend_values | tojson }};
+const trendLabels = {{ trend_labels | tojson }};
+const incomeValues = {{ income_values | tojson }};
+const expenseValuesTrend = {{ expense_trend_values | tojson }};
 
-    if (trendLabels.length > 0) {
-        new Chart(document.getElementById("trendChart"), {
-            type: "bar",
-            data: {
-                labels: trendLabels,
-                datasets: [
-                    { label: "Income", data: incomeValues },
-                    { label: "Expense", data: expenseValuesTrend }
-                ]
+if (trendLabels.length > 0) {
+    new Chart(document.getElementById("trendChart"), {
+        type: "bar",
+        data: {
+            labels: trendLabels,
+            datasets: [
+                {
+                    label: "Income",
+                    data: incomeValues,
+                    backgroundColor: "rgba(20, 184, 166, 0.75)",
+                    borderRadius: 8
+                },
+                {
+                    label: "Expense",
+                    data: expenseValuesTrend,
+                    backgroundColor: "rgba(255, 127, 106, 0.78)",
+                    borderRadius: 8
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: "top",
+                    labels: {
+                        color: "#e2e8f0"
+                    }
+                }
             },
-            options: {
-                responsive: true,
-                plugins: { legend: { position: "bottom" } }
+            scales: {
+                x: {
+                    ticks: { color: "#cbd5e1" },
+                    grid: { color: "rgba(255,255,255,0.06)" }
+                },
+                y: {
+                    ticks: { color: "#cbd5e1" },
+                    grid: { color: "rgba(255,255,255,0.06)" }
+                }
             }
-        });
-    }
+        }
+    });
+}
 
-    const expenseLabels = {{ expense_labels | tojson }};
-    const expenseValues = {{ expense_values | tojson }};
+const expenseLabels = {{ expense_labels | tojson }};
+const expenseValues = {{ expense_values | tojson }};
 
-    if (expenseLabels.length > 0) {
-        new Chart(document.getElementById("expenseChart"), {
-            type: "doughnut",
-            data: {
-                labels: expenseLabels,
-                datasets: [{ data: expenseValues }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { position: "bottom" } }
+if (expenseLabels.length > 0) {
+    new Chart(document.getElementById("expenseChart"), {
+        type: "doughnut",
+        data: {
+            labels: expenseLabels,
+            datasets: [{
+                data: expenseValues,
+                backgroundColor: [
+                    "#14b8a6",
+                    "#ff7f6a",
+                    "#3b82f6",
+                    "#8b5cf6",
+                    "#f59e0b",
+                    "#22c55e",
+                    "#ec4899",
+                    "#06b6d4",
+                    "#ef4444"
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        color: "#e2e8f0",
+                        padding: 16
+                    }
+                }
             }
-        });
-    }
+        }
+    });
+}
 </script>
-
 {% endblock %}

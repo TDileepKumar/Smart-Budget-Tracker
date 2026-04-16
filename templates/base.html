@@ -2,22 +2,323 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Smart Budget Tracker{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #07111f;
+            --bg-secondary: #0d1b2a;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.16);
+            --text-main: #f8fafc;
+            --text-soft: #cbd5e1;
+            --primary: #0f172a;
+            --accent: #14b8a6;
+            --accent-soft: rgba(20, 184, 166, 0.18);
+            --cta: #ff7f6a;
+            --cta-hover: #ff6a52;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --shadow-lg: 0 20px 45px rgba(0, 0, 0, 0.25);
+            --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.18);
+            --radius-xl: 24px;
+            --radius-lg: 18px;
+            --radius-md: 14px;
+            --transition: 0.28s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            min-height: 100%;
+        }
+
+        body {
+            font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+            color: var(--text-main);
+            background:
+                radial-gradient(circle at top left, rgba(20, 184, 166, 0.16), transparent 28%),
+                radial-gradient(circle at top right, rgba(255, 127, 106, 0.12), transparent 24%),
+                linear-gradient(135deg, #06101d 0%, #0a1628 42%, #0f1f33 100%);
+            background-attachment: fixed;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding: 18px 36px;
+            margin: 18px;
+            border-radius: 20px;
+            background: rgba(7, 17, 31, 0.55);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-left,
+        .nav-center,
+        .nav-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            color: #ffffff;
+        }
+
+        .nav-center {
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-center a {
+            padding: 10px 14px;
+            border-radius: 12px;
+            color: var(--text-soft);
+            transition: background var(--transition), color var(--transition), transform var(--transition);
+        }
+
+        .nav-center a:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .nav-right {
+            gap: 12px;
+        }
+
+        .user-name {
+            color: var(--text-soft);
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            padding: 10px 16px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--cta), #ff977f);
+            color: white;
+            font-weight: 700;
+            transition: transform var(--transition), background var(--transition), box-shadow var(--transition);
+            box-shadow: 0 10px 24px rgba(255, 127, 106, 0.22);
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(135deg, var(--cta-hover), #ff846e);
+            transform: translateY(-1px);
+        }
+
+        .container {
+            width: min(1240px, calc(100% - 32px));
+            margin: 0 auto 36px;
+            padding: 10px 0 28px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: clamp(32px, 4vw, 46px);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 28px;
+            color: #ffffff;
+        }
+
+        h2, h3, h4 {
+            color: #ffffff;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .soft-text {
+            color: var(--text-soft);
+        }
+
+        .primary-btn,
+        button {
+            border: none;
+            border-radius: 14px;
+            padding: 12px 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+        }
+
+        .primary-btn,
+        button {
+            background: linear-gradient(135deg, var(--cta), #ff9a85);
+            color: white;
+            box-shadow: 0 14px 28px rgba(255, 127, 106, 0.22);
+        }
+
+        .primary-btn:hover,
+        button:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, var(--cta-hover), #ff8d76);
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.07);
+            color: #ffffff;
+            outline: none;
+            transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: rgba(20, 184, 166, 0.7);
+            box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.14);
+            background: rgba(255, 255, 255, 0.09);
+        }
+
+        select option {
+            color: #111827;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        /* GLOBAL TRANSITIONS */
+        * {
+            transition: all 0.25s ease;
+        }
+
+        /* CARD HOVER */
+        .card:hover,
+        .analytics-summary-card:hover,
+        .transaction-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+        }
+
+        /* BUTTON EFFECT */
+        button,
+        .primary-btn,
+        .logout-btn {
+            transition: all 0.25s ease;
+        }
+
+        button:hover,
+        .primary-btn:hover,
+        .logout-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 12px 25px rgba(255,127,106,0.3);
+        }
+
+        /* INPUT FOCUS */
+        input:focus,
+        select:focus {
+            border-color: #14b8a6;
+            box-shadow: 0 0 10px rgba(20,184,166,0.4);
+        }
+
+        /* NAV LINK HOVER */
+        .nav-center a:hover {
+            color: #ffffff;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        /* GLASS GLOW */
+        .card {
+            position: relative;
+        }
+
+        .card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(circle at top, rgba(255,255,255,0.15), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover::after {
+            opacity: 1;
+        }
+
+        @media (max-width: 980px) {
+            .navbar {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 18px 20px;
+            }
+
+            .nav-left,
+            .nav-center,
+            .nav-right {
+                justify-content: center;
+            }
+
+            .container {
+                width: min(1240px, calc(100% - 20px));
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-brand">Smart Budget Tracker</div>
-        <div class="nav-links">
-            <a href="{{ url_for('main.home') }}">Home</a>
+    <div class="navbar">
+        <div class="nav-left">
+            <div class="nav-brand">💰 Smart Budget Tracker</div>
+        </div>
+
+        <div class="nav-center">
             <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('main.history') }}">History</a>
             <a href="{{ url_for('main.analytics') }}">Analytics</a>
-            <a href="{{ url_for('main.assistant') }}">Smart Assistant</a>
+            <a href="{{ url_for('main.assistant') }}">Assistant</a>
         </div>
-    </nav>
+
+        <div class="nav-right">
+            {% if session.get('username') %}
+                <span class="user-name">👤 {{ session['username'] }}</span>
+                <a href="{{ url_for('main.logout') }}" class="logout-btn">Logout</a>
+            {% endif %}
+        </div>
+    </div>
 
     <div class="container">
         {% block content %}{% endblock %}
