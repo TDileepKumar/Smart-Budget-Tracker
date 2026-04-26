@@ -5,76 +5,128 @@
 {% block content %}
 
 <style>
-.home-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 75vh;
+.hero {
+    text-align: center;
+    padding: 80px 20px 40px;
 }
 
-.home-card {
+.hero-card {
     max-width: 720px;
-    width: 100%;
+    margin: auto;
     padding: 40px;
     border-radius: 24px;
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.15);
     backdrop-filter: blur(18px);
-    text-align: center;
 }
 
-.home-title {
+.hero-title {
     font-size: 40px;
     font-weight: 800;
     margin-bottom: 10px;
 }
 
-.home-sub {
+.hero-sub {
     color: #cbd5e1;
     margin-bottom: 25px;
 }
 
-.home-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-}
-
-.home-btn {
-    padding: 12px 20px;
+.hero-btn {
+    padding: 12px 22px;
     border-radius: 14px;
     font-weight: 700;
     text-decoration: none;
-}
-
-.primary-btn {
     background: linear-gradient(135deg, #ff7f6a, #ff9a85);
     color: white;
+    display: inline-block;
 }
 
-.secondary-btn {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
-    color: white;
+/* Features Section */
+
+.features {
+    margin-top: 60px;
+    text-align: center;
+}
+
+.features-title {
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+.feature-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.feature-card {
+    width: 220px;
+    padding: 20px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.feature-card h4 {
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    font-size: 14px;
+    color: #cbd5e1;
 }
 </style>
 
-<div class="home-wrapper">
+<!-- HERO -->
+<div class="hero">
+    <div class="hero-card">
 
-<div class="home-card">
+        <div class="hero-title">Smart Budget Tracker</div>
 
-    <div class="home-title">Smart Budget Tracker</div>
+        <div class="hero-sub">
+            Track your income, control expenses, and gain financial insights with a modern dashboard.
+        </div>
 
-    <div class="home-sub">
-        Track your income, control expenses, and manage budgets with a clean and modern interface.
+        <!-- ONLY ONE CTA -->
+        <a href="{{ url_for('main.login') }}" class="hero-btn">Get Started</a>
+
     </div>
-
-    <div class="home-buttons">
-        <a href="{{ url_for('main.login') }}" class="home-btn primary-btn">Get Started</a>
-        <a href="{{ url_for('main.signup') }}" class="home-btn secondary-btn">Create Account</a>
-    </div>
-
 </div>
+
+<!-- FEATURES -->
+<div class="features">
+
+    <div class="features-title">What You Can Do</div>
+
+    <div class="feature-grid">
+
+        <div class="feature-card">
+            <h4>📊 Dashboard</h4>
+            <p>View income, expenses, and balance at a glance.</p>
+        </div>
+
+        <div class="feature-card">
+            <h4>💸 Transactions</h4>
+            <p>Add and manage all your financial records easily.</p>
+        </div>
+
+        <div class="feature-card">
+            <h4>📈 Analytics</h4>
+            <p>Visualize spending patterns and trends.</p>
+        </div>
+
+        <div class="feature-card">
+            <h4>🎯 Budget</h4>
+            <p>Set limits and track category-wise spending.</p>
+        </div>
+
+        <div class="feature-card">
+            <h4>🤖 Assistant</h4>
+            <p>Get insights and answers about your finances.</p>
+        </div>
+
+    </div>
 
 </div>
 
