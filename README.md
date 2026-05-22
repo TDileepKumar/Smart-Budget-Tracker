@@ -27,7 +27,7 @@ A full-stack web application to track income, expenses, budgets, and financial i
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 **Frontend:**
 - HTML5
@@ -125,19 +125,19 @@ http://127.0.0.1:5000/
 ![Home](Screenshots/Home.png)
 
 ### Dashboard
-![Dashboard](Screenshots/Dashboard(Empty).png)
+![Dashboard with Empty](Screenshots/DashboardEmpty.png)
 
 ### Dashboard
-![Dashboard](Screenshots/Dashboard(Data).png)
-
-### Analytics
-![Analytics](Screenshots/Analytics Page.png)
-
-### Assistant
-![Assistant](Screenshots/Assistant Page.png)
+![Dashboard with Data](Screenshots/DashboardwithData.png)
 
 ### Transaction History
-![History](Screenshots/History page.png)
+![History](Screenshots/History.png)
+
+### Analytics
+![Analytics](Screenshots/Analytics.png)
+
+### Assistant
+![Assistant](Screenshots/Assistant.png)
 
 ## Author
 Dileep Kumar
