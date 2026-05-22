@@ -124,16 +124,16 @@ http://127.0.0.1:5000/
 ### Home Page
 ![Home](Screenshots/Home.png)
 
-### Dashboard
-![Dashboard with Empty](Screenshots/DashboardEmpty.png)
+### Dashboard when it's empty
+![Dashboard](Screenshots/DashboardEmpty.png)
 
-### Dashboard
-![Dashboard with Data](Screenshots/DashboardwithData.png)
+### Dashboard with Data
+![Dashboard](Screenshots/DashboardwithData.png)
 
-### Transaction History
+### Transaction History Page
 ![History](Screenshots/History.png)
 
-### Analytics
+### Analytics 
 ![Analytics](Screenshots/Analytics.png)
 
 ### Assistant
