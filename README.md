@@ -121,5 +121,23 @@ http://127.0.0.1:5000/
 
 ## Screenshots
 
+### Home Page
+![Home](Screenshots/Home.png)
+
+### Dashboard
+![Dashboard](Screenshots/Dashboard(Empty).png)
+
+### Dashboard
+![Dashboard](Screenshots/Dashboard(Data).png)
+
+### Analytics
+![Analytics](Screenshots/Analytics Page.png)
+
+### Assistant
+![Assistant](Screenshots/Assistant Page.png)
+
+### Transaction History
+![History](Screenshots/History page.png)
+
 ## Author
 Dileep Kumar
