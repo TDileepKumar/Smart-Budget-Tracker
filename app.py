@@ -8,7 +8,7 @@ from routes.main_routes import main
 from database import init_db
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "change-this-secret-key")
+# app.secret_key = os.getenv("SECRET_KEY", "change-this-secret-key")
 
 init_db()
 app.register_blueprint(main)
